@@ -27,11 +27,15 @@ const Home = () => {
         <section className="guide-section">
           <h2>How It Works</h2> 
           <div className="guide-content">
-            <p>1. Upload your resume (PDF or DOC)</p>
-            <p>2. Paste the job description</p>
-            <p>3. Get instant ATS score analysis</p>
-            <p>4. Generate optimized cover letter</p>
-            <p>5. Edit and improve your resume directly</p>
+            <p>Upload your resume (PDF or DOC)</p>
+            <p>Paste the job description</p>
+            <p>Get instant ATS score analysis</p>
+            <p>Generate optimized cover letter</p>
+            <p>Edit and improve your resume directly</p>
+          </div>
+          <div className="guide-buttons">
+            <button className="guide-btn">Calculate Score</button>
+            <button className="guide-btn">Generate Cover Letter</button>
           </div>
         </section>
 

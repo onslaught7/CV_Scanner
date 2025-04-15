@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import './Navbar.css';
+import { VscVerified } from "react-icons/vsc";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -7,7 +8,9 @@ const Navbar = () => {
   return (
     <div className="navbar">
       <div className="nav-right">
-        <h2>LOGO</h2>
+        <h2>
+          CV SCANNER <VscVerified /> 
+        </h2>
       </div>
 
       <button className="hamburger-btn" onClick={() => setMenuOpen(!menuOpen)}>

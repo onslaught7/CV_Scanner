@@ -8,6 +8,13 @@
     color: var(--text-primary);
   }
   
+  .nav-right h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Adjust gap as needed */
+    margin: 0; /* Remove any default margins */
+  }
+  
   /* Left side nav buttons */
   .nav-left {
     display: flex;
@@ -67,31 +74,34 @@
   }
   
   /* Responsive styles */
-  @media (max-width: 768px) {
-    .nav-left {
-      display: none;
-      position: absolute;
-      top: 60px;
-      left: 0;
-      right: 0;
-      flex-direction: column;
-      background-color: var(--secondary-bg);
-      padding: 1rem 2rem;
-      z-index: 100;
-    }
-  
-    .nav-left.open {
-      display: flex;
-    }
-  
-    .hamburger-btn {
-      display: block;
-    }
-  
-    .nav-btn,
-    .nav-btn-out {
-      width: 100%;
-      text-align: left;
-    }
+@media (max-width: 768px) {
+  .nav-left {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background-color: var(--secondary-bg);
+    padding: 1rem 2rem;
+    z-index: 100;
+    overflow-y: auto;        /* allow scrolling if content is too tall */
+    max-height: 90vh;        /* ensure it can expand vertically */
   }
+
+  .nav-left.open {
+    display: flex;
+  }
+
+  .nav-left button {        /* ensure all buttons are visible */
+    display: block;         /* force block display */
+    width: 100%;
+    margin-bottom: 0.5rem;  /* add some vertical spacing */
+  }
+
+  .hamburger-btn {
+    display: block;
+  }
+}
+  
   

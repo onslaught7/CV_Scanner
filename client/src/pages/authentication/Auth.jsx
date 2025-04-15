@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './Auth.css';
 import { FaGoogle } from "react-icons/fa";
 import animation_resume from '../../assets/animation_auth_2.webm'
+import { apiClient } from '../../lib/api_client';
+import { toast } from 'sonner';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,6 +22,18 @@ const Auth = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const validateLogin = async () => {
+
+  }
+
+  const validateSignup = async () => {
+    
+  }
+
+  const handleLogin = async () => {
+
+  }
 
   return (
     <div className="auth-container">

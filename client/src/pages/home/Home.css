@@ -62,7 +62,7 @@
 /* Guide Section */
 .guide-section {
   padding: 2rem;
-  text-align: center;
+  text-align: left;
   background-color: var(--secondary-bg);
   margin: 2rem auto;
   max-width: 800px;
@@ -78,8 +78,35 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  font-size: 1.1rem;       
   color: var(--text-secondary);
 }
+
+.guide-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.guide-btn {
+  padding: 0.8rem 1.5rem;
+  background-color: var(--accent-purple);
+  border: none;
+  border-radius: 5px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.guide-btn:hover {
+  background-color: var(--hover-purple);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3);
+}
+
 
 /* Content Grid */
 .content-grid {
@@ -221,7 +248,7 @@
   }
 
   .guide-section {
-    margin: 1rem;
+    margin: 1rem; 
     padding: 1rem;
   }
 
@@ -290,4 +317,3 @@
   /* Remove any max-width that might constrain one differently */
   max-width: none;
 }
-
