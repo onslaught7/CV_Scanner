@@ -1,0 +1,293 @@
+:root {
+  --primary-bg: #0c0c10;
+  --secondary-bg: #18181f;
+  --accent-purple: #5865F2;
+  --text-primary: #ffffff;
+  --text-secondary: #c2c2c2;
+  --google-red: #ea4335;
+  --hover-bg: #2c2c38;
+  --hover-purple: #7b88ff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.home-container {
+  background-color: var(--primary-bg);
+  min-height: 100vh;
+  color: var(--text-primary);
+}
+
+/* Navigation Bar */
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: var(--secondary-bg);
+  border-bottom: 1px solid var(--hover-bg);
+}
+
+.nav-left {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--accent-purple);
+}
+
+/* Guide Section */
+.guide-section {
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--secondary-bg);
+  margin: 2rem auto;
+  max-width: 800px;
+  border-radius: 10px;
+}
+
+.guide-section h2 {
+  color: var(--accent-purple);
+  margin-bottom: 1rem;
+}
+
+.guide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Content Grid */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 0 2rem;
+  margin: 2rem 0;
+}
+
+.upload-section, .jd-section {
+  background-color: var(--secondary-bg);
+  border-radius: 10px;
+  padding: 2rem;
+  height: 400px;
+}
+
+.upload-area {
+  border: 2px dashed var(--accent-purple);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+  border-color: var(--hover-purple);
+  background-color: var(--hover-bg);
+}
+
+.upload-label {
+  cursor: pointer;
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 1rem;
+}
+
+.jd-textarea {
+  width: 100%;
+  height: 100%;
+  background-color: var(--primary-bg);
+  border: 1px solid var(--accent-purple);
+  border-radius: 10px;
+  padding: 1rem;
+  color: var(--text-primary);
+  resize: none;
+}
+
+.jd-textarea:focus {
+  outline: none;
+  border-color: var(--hover-purple);
+}
+
+/* ATS Score Section */
+.ats-section {
+  padding: 0 2rem 2rem;
+}
+
+/* Edit Resume Button */
+.edit-btn {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--accent-purple);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+/* Same purple hover effect */
+.edit-btn:hover {
+  background-color: var(--hover-purple);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3);
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+  .edit-btn {
+    bottom: 0.5rem;
+    right: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+.ats-score-box {
+  background-color: var(--secondary-bg);
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.score-analysis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.strengths, .improvements {
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.strengths {
+  border: 1px solid #4CAF50;
+}
+
+.improvements {
+  border: 1px solid #FFC107;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+
+  .upload-section, .jd-section {
+    height: 300px;
+  }
+
+  .nav-bar {
+    padding: 1rem;
+  }
+
+  .nav-left {
+    gap: 0.5rem;
+  }
+
+  .guide-section {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .score-analysis {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-btn {
+    display: none;
+  }
+
+  .profile-pic {
+    width: 35px;
+    height: 35px;
+  }
+
+  .guide-section {
+    font-size: 0.9rem;
+  }
+}
+
+.resume-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 100%;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.resume-icon {
+  width: 160px;
+  height: auto;
+}
+
+.resume-name {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 0 0.5rem;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* New Top Info Section for Guide & ATS Score Box */
+.top-info-section {
+  display: flex;
+  gap: 2rem;
+  padding: 0 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+/* Ensure both guide section and ATS score box take equal space */
+.top-info-section .guide-section,
+.top-info-section .ats-score-box {
+  flex: 1;
+  min-width: 300px;
+  /* Optional: set a minimum height to ensure they look equal */
+  min-height: 400px;
+  margin: 0 auto;
+  /* Remove any max-width that might constrain one differently */
+  max-width: none;
+}
+

@@ -1,0 +1,97 @@
+/* Base styles */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--primary-bg);
+    color: var(--text-primary);
+  }
+  
+  /* Left side nav buttons */
+  .nav-left {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  /* Normal nav buttons (Home, Support, Contact) */
+  /* Normal nav buttons (Home, Support, Contact) */
+.nav-btn {
+    background-color: #20202a;
+    border: 1px solid #2c2c2c;
+    border-radius: 25px;
+    padding: 0.6rem 1.2rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+  
+  .nav-btn:hover {
+    background-color: var(--hover-purple);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3);
+  }
+  
+  
+  
+  /* Logout button — styled like Google sign-in */
+  .nav-btn-out {
+    padding: 0.6rem 1.2rem;
+    background-color: var(--google-red);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+    font-weight: 600;
+  }
+  
+  .nav-btn-out:hover {
+    background-color: #c5221f;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(234, 67, 53, 0.25);
+  }
+  
+  /* Hamburger toggle (only on small screens) */
+  .hamburger-btn {
+    display: none;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .nav-left {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      background-color: var(--secondary-bg);
+      padding: 1rem 2rem;
+      z-index: 100;
+    }
+  
+    .nav-left.open {
+      display: flex;
+    }
+  
+    .hamburger-btn {
+      display: block;
+    }
+  
+    .nav-btn,
+    .nav-btn-out {
+      width: 100%;
+      text-align: left;
+    }
+  }
+  
