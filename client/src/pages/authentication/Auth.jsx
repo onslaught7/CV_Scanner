@@ -69,6 +69,19 @@ const Auth = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
+          {!isLogin && (
+            <div className="form-group">
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          )}
+
           <div className="form-group">
             <input
               type="email"

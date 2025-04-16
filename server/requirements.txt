@@ -1,0 +1,17 @@
+# Core backend
+fastapi
+fastapi-cors
+uvicorn[standard]
+python-docx
+PyPDF2
+openai
+python-dotenv
+aiofiles  
+python-multipart
+requests
+httpx
+cors
+SQLAlchemy
+psycopg2-binary
+alembic
+pydantic
