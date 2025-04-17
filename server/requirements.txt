@@ -15,3 +15,7 @@ SQLAlchemy
 psycopg2-binary
 alembic
 pydantic
+pyjwt
+passlib[bcrypt]
+python-multipart
+fastapi[standard]
