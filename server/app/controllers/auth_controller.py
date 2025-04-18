@@ -7,19 +7,15 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
-from dotenv import load_dotenv
-import os
 from server.app.models.models import UserModel
 from sqlalchemy.orm import Session
 from server.app.models.database import get_db 
+from server.config import settings
 
 
-load_dotenv()
-
-
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES=60
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
 class Token(BaseModel):

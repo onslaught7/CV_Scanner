@@ -13,7 +13,7 @@ class UserModel(Base):
     password = Column(String, nullable=False)
     disabled = Column(Boolean, default=False, nullable=False)
 
-    resume = relationship("Resume", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    resume = relationship("ResumeModel", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
 
 # Model for our resume table
@@ -26,4 +26,4 @@ class ResumeModel(Base):
     cover_letter_url = Column(String)
     ats_score = Column(Integer)
 
-    user = relationship("User", back_populates="resume")
+    user = relationship("UserModel", back_populates="resume")

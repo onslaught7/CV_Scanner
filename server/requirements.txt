@@ -2,6 +2,7 @@
 fastapi
 fastapi-cors
 uvicorn[standard]
+uvicorn
 python-docx
 PyPDF2
 openai
@@ -15,6 +16,7 @@ SQLAlchemy
 psycopg2-binary
 alembic
 pydantic
+pydantic_settings
 pyjwt
 passlib[bcrypt]
 python-multipart

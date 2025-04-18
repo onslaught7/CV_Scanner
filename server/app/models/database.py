@@ -1,13 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
+from server.config import settings
 
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-print(DATABASE_URL)
+DATABASE_URL = settings.DATABASE_URL
 
 
 # Creating the starting point for our SQLAlchemy application

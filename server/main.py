@@ -1,12 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from server.app.routes import auth_routes, coverletter_route, resume_route
 from fastapi.middleware.cors import CORSMiddleware
-import os
-from dotenv import load_dotenv
-
-
-# Load the eenvironment variables
-load_dotenv()
+from server.config import settings
 
 
 # Creating the FastAPI instance
@@ -14,7 +9,7 @@ app = FastAPI(title="CV Scanner API", version="dev_1.0")
 
 
 # Allow cross-origin resource sharing between client and server
-origins = [os.getenv("ORIGIN")]
+origins = [settings.ORIGIN]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
