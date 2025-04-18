@@ -4,7 +4,7 @@ from server.app.models.database import Base
 
 
 # Model for our users table
-class User(Base):
+class UserModel(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -17,7 +17,7 @@ class User(Base):
 
 
 # Model for our resume table
-class Resume(Base):
+class ResumeModel(Base):
     __tablename__ = "resumes"
 
     id = Column(Integer, primary_key=True, index=True)

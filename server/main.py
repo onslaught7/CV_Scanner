@@ -1,6 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
-from sqlalchemy.orm import Session
-from server.app.models.database import SessionLocal
+from fastapi import FastAPI, HTTPException
 from server.app.routes import auth_routes, coverletter_route, resume_route
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -27,15 +25,6 @@ app.add_middleware(
 )
 
 
-# Dependency to get a db session per request
-def get_db():
-    db = SessionLocal()
-    try: 
-        yield db # gives control back to the route using it
-    finally:
-        db.close()
-
-
 # Health Check Route
 @app.get("/")
 def read_root():
@@ -44,6 +33,6 @@ def read_root():
 
 # Include the routes
 app.include_router(auth_routes.router, prefix="/api/auth", tags=["Auth"])
-app.include_router(coverletter_route.router, prefix="/api/coverletter", tags=["CoverLetter"])
-app.include_router(resume_route.router, prefix="/api/resume", tags=["Resume"])
+# app.include_router(coverletter_route.router, prefix="/api/coverletter", tags=["CoverLetter"])
+# app.include_router(resume_route.router, prefix="/api/resume", tags=["Resume"])
 

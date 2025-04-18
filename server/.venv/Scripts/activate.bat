@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=d:\CV\Projects\CV_Scanner\server\.venv
+set VIRTUAL_ENV=c:\Projects\CV_Scanner\server\.venv
 
 if not defined PROMPT set PROMPT=$P$G
 

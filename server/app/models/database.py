@@ -5,11 +5,24 @@ import os
 
 load_dotenv()
 
+
 DATABASE_URL = os.getenv("DATABASE_URL")
+print(DATABASE_URL)
+
 
 # Creating the starting point for our SQLAlchemy application
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 # All the table models will inherit from this class
 Base = declarative_base()
+
+
+# Dependency to get a DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
