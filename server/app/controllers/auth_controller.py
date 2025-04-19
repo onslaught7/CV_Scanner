@@ -4,6 +4,7 @@ from typing import Annotated
 import jwt
 from fastapi import Depends, HTTPException, status #, FastAPI
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
@@ -33,6 +34,18 @@ class SignupResponse(BaseModel):
     access_token: str
     token_type: str
 
+    class Config:
+        orm_mode = True  # This allows SQLAlchemy models to be serialized automatically
+
+
+class LoginResponse(BaseModel):
+    message: str
+    access_token: str
+    token_type: str
+
+    class Config:
+        orm_mode = True  # This allows SQLAlchemy models to be serialized automatically
+
 
 class User(BaseModel):
     id: int
@@ -52,6 +65,7 @@ class UserInDB(User):
     password: str
 
 
+# generates a random salt internally for every password hash
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -131,8 +145,7 @@ async def get_current_active_user(current_user: Annotated[User, Depends(get_curr
     return current_user
 
 
-# @app.post("/login")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)) -> Token:
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
     print(form_data.username)
     if not user:
@@ -146,9 +159,23 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
         data = {"sub": user.email}, # we are passing the email as the token subject
         expires_delta = access_token_expires        
     )
-    return Token(access_token=access_token, token_type="bearer")
+    response_data = LoginResponse(
+        message="Login Successful",
+        access_token=access_token,
+        token_type="bearer"
+    )
+    response = JSONResponse(content=response_data.model_dump(), status_code=status.HTTP_200_OK)
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=False,  # Set to True if using HTTPS
+        samesite="lax",
+        max_age=3600
+    )
+    return response
 
-# @app.post("/signup", response_model=SignupResponse)
+
 async def signup(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
     existing_user = get_user_by_email(db, user.email)
     if existing_user:
@@ -166,13 +193,36 @@ async def signup(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
         data = {"sub": new_user.email}, 
         expires_delta = access_token_expires
     )
-    return SignupResponse(
+    response_data = SignupResponse(
         message="User created successfully",
         user=new_user.email,
         access_token=access_token,
-        token_type="bearer"
+        token_type="bearer",
+    )
+    response = JSONResponse(
+        content=response_data.model_dump(),
+        status_code=status.HTTP_201_CREATED
+    )
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=False,  # Set to True if using HTTPS
+        samesite="lax",
+        max_age=3600  # Token expiration time in seconds
     )
 
+
+async def logout(response: JSONResponse):
+    response = JSONResponse(
+        content={"message": "Logged out successfully"},
+        status_code=status.HTTP_200_OK
+    )
+    response.delete_cookie(
+        key="access_token",  # Cookie name to delete
+        path="/"  # Ensures it removes the cookie from all routes
+    )
+    return response
 
 
 # @app.get("/user/me/", response_model=User)
