@@ -10,8 +10,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 router = APIRouter()
 
 
-@router.post("/signup", response_model=SignupResponse)
+@router.post("/signup")
 async def signup_user(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
+    print("User from Route: ", user)
     return await signup(user, db)
 
 

@@ -1,13 +1,28 @@
-import React, { useState } from 'react';
+import { useRef, useState } from 'react';
 import './Home.css';
 import Navbar from '../../components/Navbar';
 import resumeImage from '../../assets/resume.png'
+import { useAppStore } from '../../store/index.js';
+import toast, { Toaster } from 'react-hot-toast';
+import { useEffect } from 'react';
+import {  } from 'react';
 
 const Home = () => {
+  const { userInfo, toastMessage, clearToastMessage } = useAppStore();
   const [jobDescription, setJobDescription] = useState('');
   const [resumeFile, setResumeFile] = useState(null);
   const [atsScore, setAtsScore] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const hasShownToast = useRef(false);
+
+  useEffect(() => {
+    if (toastMessage && !hasShownToast.current) {
+      toast.success(toastMessage);
+      clearToastMessage();
+      hasShownToast.current = true;
+    }
+  }, [toastMessage, clearToastMessage]);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -20,6 +35,31 @@ const Home = () => {
     <div className="home-container">
       {/* Navigation Bar */}
       <Navbar/>
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          // Custom styles for different types
+          success: {
+            style: {
+              background: 'green',
+            },
+          },
+          error: {
+            style: {
+              background: 'red',
+            },
+          },
+        }}
+      />
+      {userInfo ? 
+      <h2 className="welcome-message">Hi {userInfo.name} 👋 let's get to building the best Resume </h2> :
+      <h2 className="welcome-message">Hi Explorer 👋 let's get to building the best Resume</h2>
+      }
 
       {/* Guide Section */}
       {/* Guide and ATS Section Side-by-Side */}

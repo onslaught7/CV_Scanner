@@ -10,15 +10,14 @@ app = FastAPI(title="CV Scanner API", version="dev_1.0")
 
 # Allow cross-origin resource sharing between client and server
 origins = [settings.ORIGIN]
+print("Allowed origin: ",origins[0])
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins,  # or ["*"] for dev
     allow_credentials=True,
-    allow_methods=["POST", "GET", "PUT"],
+    allow_methods=["*"],
     allow_headers=["*"],
-    max_age=900, # specify the ttl for the browser to use when caching our responses, 600 seconds by default
 )
-
 
 # Health Check Route
 @app.get("/")

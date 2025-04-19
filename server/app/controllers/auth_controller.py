@@ -30,21 +30,23 @@ class TokenData(BaseModel):
 
 class SignupResponse(BaseModel):
     message: str
-    user: EmailStr
+    email: EmailStr
     access_token: str
     token_type: str
+    name: str
 
     class Config:
-        orm_mode = True  # This allows SQLAlchemy models to be serialized automatically
+        from_attributes = True  # This allows SQLAlchemy models to be serialized automatically
 
 
 class LoginResponse(BaseModel):
     message: str
     access_token: str
     token_type: str
+    name: str
 
     class Config:
-        orm_mode = True  # This allows SQLAlchemy models to be serialized automatically
+        from_attributes = True  # This allows SQLAlchemy models to be serialized automatically
 
 
 class User(BaseModel):
@@ -146,8 +148,8 @@ async def get_current_active_user(current_user: Annotated[User, Depends(get_curr
 
 
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
+    print("form_data", form_data)
     user = authenticate_user(db, form_data.username, form_data.password)
-    print(form_data.username)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -159,10 +161,13 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
         data = {"sub": user.email}, # we are passing the email as the token subject
         expires_delta = access_token_expires        
     )
+    user_data = await get_current_user(access_token, db)
+    name_data = user_data.username
     response_data = LoginResponse(
         message="Login Successful",
         access_token=access_token,
-        token_type="bearer"
+        token_type="bearer",
+        name=name_data
     )
     response = JSONResponse(content=response_data.model_dump(), status_code=status.HTTP_200_OK)
     response.set_cookie(
@@ -177,6 +182,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
 
 
 async def signup(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
+    print("User", user)
     existing_user = get_user_by_email(db, user.email)
     if existing_user:
         raise HTTPException(
@@ -185,6 +191,7 @@ async def signup(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
         )
     hashed_password = get_hash_password(user.password)
     user_data = user.model_dump()
+    print("User_data", user_data)
     user_data["password"] = hashed_password
     user_data["disabled"] = False
     new_user = create_user(db, user_data)
@@ -195,9 +202,10 @@ async def signup(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
     )
     response_data = SignupResponse(
         message="User created successfully",
-        user=new_user.email,
+        email=new_user.email,
         access_token=access_token,
         token_type="bearer",
+        name=new_user.username
     )
     response = JSONResponse(
         content=response_data.model_dump(),
@@ -211,6 +219,7 @@ async def signup(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
         samesite="lax",
         max_age=3600  # Token expiration time in seconds
     )
+    return response
 
 
 async def logout(response: JSONResponse):
