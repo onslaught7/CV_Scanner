@@ -222,14 +222,14 @@ async def signup(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
     return response
 
 
-async def logout(response: JSONResponse):
+async def logout():
     response = JSONResponse(
         content={"message": "Logged out successfully"},
         status_code=status.HTTP_200_OK
     )
     response.delete_cookie(
-        key="access_token",  # Cookie name to delete
-        path="/"  # Ensures it removes the cookie from all routes
+        key="access_token",
+        path="/"
     )
     return response
 
