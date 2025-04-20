@@ -5,12 +5,17 @@ import resumeImage from '../../assets/resume.png'
 import { useAppStore } from '../../store/index.js';
 import toast, { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
+import { UPLOAD_RESUME_ROUTE, CALCULATE_ATS_ROUTE } from '../../utils/constants.js';
+import { FaDownload } from "react-icons/fa6";
+import { apiClient } from '../../lib/api_client.js';
 
 const Home = () => {
   const { userInfo, toastMessage, clearToastMessage } = useAppStore();
   const [jobDescription, setJobDescription] = useState('');
-  const [resumeFile, setResumeFile] = useState(null);
-  const [atsScore, setAtsScore] = useState(null);
+  const [resumeFile, setResumeFile] = useState();
+  const [atsScore, setAtsScore] = useState();
+  const [matchingKeyWords, setMatchingKeyWords] = useState({});
+  const [missingKeyWords, setMissingKeywords] = useState({});
   const [menuOpen, setMenuOpen] = useState(false);
 
   const hasShownToast = useRef(false);
@@ -23,12 +28,68 @@ const Home = () => {
     }
   }, [toastMessage, clearToastMessage]);
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file && (file.type === 'application/pdf' || file.type === 'application/msword' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
-      setResumeFile(file);
+  // const handleFileUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file && (file.type === 'application/pdf' || file.type === 'application/msword' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+  //     setResumeFile(file);
+  //   }
+  // };
+  useEffect(() => {
+    if (resumeFile) {
+      console.log("Updated resume file in state:", resumeFile);
+      console.log("Ats Score: ", atsScore);
+      console.log("Matching Keywords: ", matchingKeyWords);
+      console.log("Missing Keywords: ", missingKeyWords);
     }
-  };
+  }, [resumeFile, atsScore, matchingKeyWords, missingKeyWords]);
+
+  const handleResumeChange = (file) => {
+    if (file) {
+      console.log("Resume added: ", file);
+    } else {
+      toast.error("Unsupported file format");
+    }
+  }
+
+  const handleResumeUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("resume", file);
+    try {
+      const response = await apiClient.post(
+        UPLOAD_RESUME_ROUTE,
+        formData,
+        { withCredentials: true },
+      )
+
+      if (response.status === 200) {
+        toast.success("Resume uploaded");
+        setResumeFile(file);
+      }
+    } catch (error) {
+      toast.error("Unexpected error uploading resume");
+      console.error("Unexpected error", error);
+    }
+  }
+
+  const handleCalculateAts = async () => {
+    try {
+      if (resumeFile) {
+        const response = await apiClient.get(
+          CALCULATE_ATS_ROUTE,
+          { withCredentials }
+        );
+
+        if (response.status === 200) {
+          const { atsScore, keyWordsMatch, keyWordsMissing } = response.data;
+          setAtsScore(atsScore);
+          setMatchingKeyWords(keyWordsMatch);
+          setMissingKeywords(keyWordsMissing);
+        }
+      }
+    } catch (error) {
+
+    }
+  }
 
   return (
     <div className="home-container">
@@ -68,12 +129,17 @@ const Home = () => {
           <div className="guide-content">
             <p>Upload your resume (PDF or DOC)</p>
             <p>Paste the job description</p>
+            <p>Click on Calculate Score</p>
             <p>Get instant ATS score analysis</p>
-            <p>Generate optimized cover letter</p>
-            <p>Edit and improve your resume directly</p>
+            <p>Generate optimized cover letter and recommendations</p>
           </div>
           <div className="guide-buttons">
-            <button className="guide-btn">Calculate Score</button>
+            <button 
+              className="guide-btn"
+              onClick={handleCalculateAts}
+            >
+              Calculate Score
+            </button>
             <button className="guide-btn">Generate Cover Letter</button>
           </div>
         </section>
@@ -103,7 +169,7 @@ const Home = () => {
           ) : (
             <p>Your ATS score will appear here after analysis</p>
           )}
-          <button className="edit-btn">Edit Resume</button>
+          <button className="edit-btn"><FaDownload /> Cover Letter</button>
         </div>
       </div>
 
@@ -114,9 +180,10 @@ const Home = () => {
           <div className="upload-area">
             <input 
               type="file" 
+              name='file'
               id="resume-upload" 
               hidden 
-              onChange={handleFileUpload}
+              onChange={(e) => handleResumeChange(e.target.files[0])}
               accept=".pdf,.doc,.docx"
             />
             <label htmlFor="resume-upload" className="upload-label">
@@ -124,6 +191,12 @@ const Home = () => {
                 <div className="resume-preview">
                   <img src={resumeImage} alt="CV Icon" className="resume-icon" />
                   <span className="resume-name">{resumeFile.name}</span>
+                  <button
+                    className='upload-confirm-btn'
+                    onClick={() => handleResumeUpload(resumeFile)}
+                  >
+                    Upload Resume
+                  </button>
                 </div>
               ) : (
                 'Drag & Drop or Click to Upload Resume'

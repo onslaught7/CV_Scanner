@@ -2,15 +2,19 @@ from fastapi import FastAPI, HTTPException
 from server.app.routes import auth_routes, coverletter_route, resume_routes
 from fastapi.middleware.cors import CORSMiddleware
 from server.config import settings
+from fastapi.staticfiles import StaticFiles
+import os
+
+
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
 
 # Creating the FastAPI instance
-app = FastAPI(title="CV Scanner API", version="dev_1.0")
-
+app = FastAPI(title="CV Scanner API", version="dev_1.0", docs_url=None)
+    
 
 # Allow cross-origin resource sharing between client and server
 origins = [settings.ORIGIN]
-print("Allowed origin: ",origins[0])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # or ["*"] for dev
@@ -18,6 +22,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if settings.ENV != "production":
+    app.mount(settings.UPLOAD_MOUNT_PATH, StaticFiles(directory=settings.UPLOAD_DIR), name="upload-resumes")
 
 # Health Check Route
 @app.get("/")

@@ -2,6 +2,9 @@ from pydantic_settings import BaseSettings
 from pathlib import Path
 
 class Settings(BaseSettings):
+    ENV: str
+    UPLOAD_DIR: str
+    UPLOAD_MOUNT_PATH: str
     OPENAI_API_KEY: str
     SECRET_KEY: str
     ALGORITHM: str

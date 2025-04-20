@@ -16,7 +16,7 @@ from server.config import settings
 
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
 
 class Token(BaseModel):
@@ -176,7 +176,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
         httponly=True,
         secure=False,  # Set to True if using HTTPS
         samesite="lax",
-        max_age=3600
+        max_age=7200
     )
     return response
 
@@ -217,7 +217,7 @@ async def signup(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
         httponly=True,
         secure=False,  # Set to True if using HTTPS
         samesite="lax",
-        max_age=3600  # Token expiration time in seconds
+        max_age=7200  # Token expiration time in seconds
     )
     return response
 

@@ -154,6 +154,35 @@
   transition: all 0.3s ease;
 }
 
+.guide-btn,
+.upload-confirm-btn,
+.edit-btn {
+  background-color: var(--accent-purple);
+  color: var(--text-primary);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.guide-btn:hover,
+.upload-confirm-btn:hover,
+.edit-btn:hover {
+  background-color: var(--hover-purple);
+  transform: translateY(-1px);
+}
+
+.upload-confirm-btn,
+.edit-btn {
+  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
 .upload-area:hover {
   border-color: var(--hover-purple);
   background-color: var(--hover-bg);
@@ -225,6 +254,11 @@
   padding: 2rem;
   text-align: center;
   position: relative;
+}
+
+.ats-score-box p {
+  color: var(--accent-purple);
+  font-weight: 700;
 }
 
 .score-analysis {
