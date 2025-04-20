@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends
 from typing import Annotated
 from fastapi import UploadFile, File
 from server.config import settings
-from server.app.controllers.resume_controller import save_resume_locally, save_resume_s3
+from server.app.models.database import get_db
+from sqlalchemy.orm import Session
+from server.app.controllers.resume_controller import save_resume_locally, save_resume_s3, calculate_ats_score
 from server.app.middlewares.auth_middleware import verify_token
 from server.app.controllers.auth_controller import User
 
@@ -14,6 +16,7 @@ router = APIRouter()
 @router.post("/upload-resume")  
 async def upload_resume(
     current_user: Annotated[User, Depends(verify_token)],
+    db: Annotated[Session, Depends(get_db)],
     resume: UploadFile = File(...)    
 ):
     print("File received at resume_routes: ", resume.filename)
@@ -24,12 +27,17 @@ async def upload_resume(
         filename = resume.filename
         pass
     else:
-        path, filename = await save_resume_locally(current_user, resume)
+        path, filename = await save_resume_locally(current_user, db, resume)
     return {
         "message": "Resume uploaded successfully",
         "resume_path": path,
         "filename": filename
     }
+
+
+@router.get("/calculate-ats")
+async def calculate_ats():
+    return await calculate_ats_score()
 
 
 

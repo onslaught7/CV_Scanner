@@ -45,6 +45,7 @@ const Home = () => {
 
   const handleResumeChange = (file) => {
     if (file) {
+      setResumeFile(file)
       console.log("Resume added: ", file);
     } else {
       toast.error("Unsupported file format");
@@ -64,6 +65,8 @@ const Home = () => {
       if (response.status === 200) {
         toast.success("Resume uploaded");
         setResumeFile(file);
+      } else {
+        setResumeFile(undefined);
       }
     } catch (error) {
       toast.error("Unexpected error uploading resume");
@@ -87,7 +90,8 @@ const Home = () => {
         }
       }
     } catch (error) {
-
+      toast.error("Error analysig resume");
+      console.error("Error analysing resume", error);
     }
   }
 
