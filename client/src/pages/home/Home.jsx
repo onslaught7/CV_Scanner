@@ -28,12 +28,6 @@ const Home = () => {
     }
   }, [toastMessage, clearToastMessage]);
 
-  // const handleFileUpload = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file && (file.type === 'application/pdf' || file.type === 'application/msword' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
-  //     setResumeFile(file);
-  //   }
-  // };
   useEffect(() => {
     if (resumeFile) {
       console.log("Updated resume file in state:", resumeFile);
@@ -76,11 +70,12 @@ const Home = () => {
 
   const handleCalculateAts = async () => {
     try {
-      if (resumeFile) {
-        const response = await apiClient.get(
+      if (resumeFile && jobDescription) {
+        const response = await apiClient.post(
           CALCULATE_ATS_ROUTE,
-          { withCredentials }
-        );
+          { jobDescription },
+          { withCredentials: true }
+        )
 
         if (response.status === 200) {
           const { atsScore, keyWordsMatch, keyWordsMissing } = response.data;
@@ -88,9 +83,11 @@ const Home = () => {
           setMatchingKeyWords(keyWordsMatch);
           setMissingKeywords(keyWordsMissing);
         }
+      } else {
+        toast.error("Both Resume and Job Description required for ATS Score");
       }
     } catch (error) {
-      toast.error("Error analysig resume");
+      toast.error("Error analysing resume");
       console.error("Error analysing resume", error);
     }
   }
@@ -131,7 +128,7 @@ const Home = () => {
         <section className="guide-section">
           <h2>How It Works</h2> 
           <div className="guide-content">
-            <p>Upload your resume (PDF or DOC)</p>
+            <p>Upload your resume (PDF or DOCX)</p>
             <p>Paste the job description</p>
             <p>Click on Calculate Score</p>
             <p>Get instant ATS score analysis</p>
