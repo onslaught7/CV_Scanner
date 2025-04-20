@@ -5,7 +5,6 @@ import resumeImage from '../../assets/resume.png'
 import { useAppStore } from '../../store/index.js';
 import toast, { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
-import {  } from 'react';
 
 const Home = () => {
   const { userInfo, toastMessage, clearToastMessage } = useAppStore();

@@ -1,10 +1,11 @@
-from server.app.controllers.auth_controller import login, signup, logout, google_login, google_signup, SignupResponse, LoginResponse, UserCreate
+from server.app.controllers.auth_controller import login, signup, logout, google_login, google_signup, SignupResponse, LoginResponse, User, UserCreate, get_current_user
 # from server.app.middlewares.auth_middleware import verify_token
 from fastapi import APIRouter, Depends
 from typing import Annotated
 from sqlalchemy.orm import Session
 from server.app.models.database import get_db
 from fastapi.security import OAuth2PasswordRequestForm
+from server.app.middlewares.auth_middleware import verify_token
 
 
 router = APIRouter()
@@ -24,3 +25,8 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 @router.post("/logout")
 async def logout_user():
     return await logout()
+
+
+@router.get("/user-info")
+async def get_user_info(current_user: Annotated[User, Depends(verify_token)]):
+    return current_user
