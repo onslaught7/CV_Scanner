@@ -14,4 +14,3 @@ export const CALCULATE_ATS_ROUTE = `${RESUME_ROUTES}/calculate-ats`;
 
 export const COVERLETTER_ROUTES = 'api/coverletter';
 export const GENERATE_COVERLETTER_ROUTE = `${COVERLETTER_ROUTES}/generate-coverletter`;
-export const DOWNLOAD_COVERLETTER_ROUTE = `${COVERLETTER_ROUTES}/download-coverletter`;

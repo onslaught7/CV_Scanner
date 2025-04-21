@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File
 from typing import Annotated
-from fastapi import UploadFile, File
 from server.config import settings
 from server.app.models.database import get_db
 from sqlalchemy.orm import Session
 from server.app.controllers.resume_controller import JDRequest, save_resume_locally, save_resume_s3, calculate_ats_score, ATSResponse
 from server.app.middlewares.auth_middleware import verify_token
 from server.app.controllers.auth_controller import User
+
 
 router = APIRouter()
 
@@ -42,7 +42,3 @@ async def calculate_ats(
     db: Annotated[Session, Depends(get_db)]
 ):
     return await calculate_ats_score(jd.jobDescription, current_user, db)
-
-
-
-

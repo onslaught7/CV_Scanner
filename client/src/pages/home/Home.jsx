@@ -5,7 +5,7 @@ import resumeImage from '../../assets/resume.png'
 import { useAppStore } from '../../store/index.js';
 import toast, { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
-import { UPLOAD_RESUME_ROUTE, CALCULATE_ATS_ROUTE } from '../../utils/constants.js';
+import { UPLOAD_RESUME_ROUTE, CALCULATE_ATS_ROUTE, GENERATE_COVERLETTER_ROUTE } from '../../utils/constants.js';
 import { FaDownload } from "react-icons/fa6";
 import { apiClient } from '../../lib/api_client.js';
 import { MdOutlineCalculate } from "react-icons/md";
@@ -97,6 +97,31 @@ const Home = () => {
     }
   }
 
+  const handleGenerateCoverLetter = async () => {
+    try{
+      if (resumeFile && jobDescription) {
+        const toastId = toast.loading('Generating Cover Letter...');
+        const response = await apiClient.post(
+          GENERATE_COVERLETTER_ROUTE,
+          { jobDescription },
+          { withCredentials: true }
+        );
+
+        if (response.status === 200) {
+          const { coverLetter } = response.data;
+          toast.success("Cover Letter Generated");
+          toast.dismiss(toastId);
+          // Logic to download the cover letter on client side
+        } else {
+          toast.error("Make sure resume has been uploaded and job description is included");
+        }
+      }
+    } catch (error) {
+      toast.error("Error generating cover letter");
+      console.error("Error generating cover letter", error);
+    }
+  }
+
   return (
     <div className="home-container">
       {/* Navigation Bar */}
@@ -146,7 +171,11 @@ const Home = () => {
             >
               <MdOutlineCalculate /> Calculate Score
             </button>
-            <button className="guide-btn"><FaDownload /> Generate Cover Letter</button>
+            <button className="guide-btn"
+              onClick={handleGenerateCoverLetter}
+            >
+              <FaDownload /> Generate Cover Letter
+            </button>
           </div>
         </section>
 

@@ -52,15 +52,17 @@ async def save_resume_s3(file: UploadFile, upload_dir: str = "uploads/resumes"):
 
 async def calculate_ats_score(job_description: str, user: User, db: Session):
     try:
-        resume_path_url = db.query(ResumeModel).filter(ResumeModel.user_id == user.id).first().resume_url
+        resume_record = db.query(ResumeModel).filter(ResumeModel.user_id == user.id).first()
+        resume_path_url = resume_record.resume_url
         if not resume_path_url or not job_description:
             raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resume not found."
         )
         ats_score, matching_keywords, missing_keywords = ats_score_and_keywords(resume_path_url, job_description) 
-        print("Resume URL froom database: ", resume_path_url)
-        print("Job Description from client: ", job_description)
+        resume_record.ats_score = ats_score
+        db.commit()
+        db.refresh(resume_record)
         return {
             "atsScore": ats_score,
             "keyWordsMatching": matching_keywords,
