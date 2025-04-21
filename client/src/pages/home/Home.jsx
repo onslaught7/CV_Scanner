@@ -8,14 +8,16 @@ import { useEffect } from 'react';
 import { UPLOAD_RESUME_ROUTE, CALCULATE_ATS_ROUTE } from '../../utils/constants.js';
 import { FaDownload } from "react-icons/fa6";
 import { apiClient } from '../../lib/api_client.js';
+import { MdOutlineCalculate } from "react-icons/md";
+import { MdOutlineFindInPage } from "react-icons/md";
 
 const Home = () => {
   const { userInfo, toastMessage, clearToastMessage } = useAppStore();
   const [jobDescription, setJobDescription] = useState('');
   const [resumeFile, setResumeFile] = useState();
   const [atsScore, setAtsScore] = useState();
-  const [matchingKeyWords, setMatchingKeyWords] = useState({});
-  const [missingKeyWords, setMissingKeywords] = useState({});
+  const [matchingKeyWords, setMatchingKeyWords] = useState([]);
+  const [missingKeyWords, setMissingKeywords] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const hasShownToast = useRef(false);
@@ -71,6 +73,7 @@ const Home = () => {
   const handleCalculateAts = async () => {
     try {
       if (resumeFile && jobDescription) {
+        const toastId = toast.loading('Calculating Score...');
         const response = await apiClient.post(
           CALCULATE_ATS_ROUTE,
           { jobDescription },
@@ -78,9 +81,11 @@ const Home = () => {
         )
 
         if (response.status === 200) {
-          const { atsScore, keyWordsMatch, keyWordsMissing } = response.data;
+          const { atsScore, keyWordsMatching, keyWordsMissing } = response.data;
+          toast.success("Score Calculated")
+          toast.dismiss(toastId);
           setAtsScore(atsScore);
-          setMatchingKeyWords(keyWordsMatch);
+          setMatchingKeyWords(keyWordsMatching);
           setMissingKeywords(keyWordsMissing);
         }
       } else {
@@ -139,30 +144,52 @@ const Home = () => {
               className="guide-btn"
               onClick={handleCalculateAts}
             >
-              Calculate Score
+              <MdOutlineCalculate /> Calculate Score
             </button>
-            <button className="guide-btn">Generate Cover Letter</button>
+            <button className="guide-btn"><FaDownload /> Generate Cover Letter</button>
           </div>
         </section>
 
         <div className="ats-score-box">
           {atsScore ? (
             <>
-              <h3>Your ATS Score: {atsScore}/100</h3>
+              <h3
+                style = {
+                  {
+                    color: 
+                      atsScore <= 30 ? "red" : atsScore < 80 ? "orange" : "green"
+                  }
+                }
+              >
+                Your ATS Score: {atsScore}%
+              </h3>
               <div className="score-analysis">
                 <div className="strengths">
-                  <h4>✅ Strong Points:</h4>
+                  <h4>✅ Keywords Matching:</h4>
                   <ul>
-                    <li>Keyword matches (85%)</li>
-                    <li>Experience alignment</li>
-                    <li>Education requirements met</li>
+                    {
+                      matchingKeyWords.length > 0 ? (
+                        matchingKeyWords.map((keyword, index) => (
+                          <li key={index}>{keyword}</li>
+                        )) 
+                      ) : (
+                        <li>❌ No Matching Keywords</li>
+                      )
+                    }
                   </ul>
                 </div>
                 <div className="improvements">
-                  <h4>⚠️ Areas to Improve:</h4>
+                  <h4>⚠️ Keywords Missing:</h4>
                   <ul>
-                    <li>Missing certification</li>
-                    <li>Skill gap in project management</li>
+                    {
+                      missingKeyWords.length > 0 ? (
+                        missingKeyWords.map((keyword, index) => (
+                          <li key={index}>{keyword}</li>
+                        ))
+                      ) : (
+                        <li>✅ Great, Perfect Match</li>
+                      )
+                    }
                   </ul>
                 </div>
               </div>
@@ -170,7 +197,7 @@ const Home = () => {
           ) : (
             <p>Your ATS score will appear here after analysis</p>
           )}
-          <button className="edit-btn"><FaDownload /> Cover Letter</button>
+          <button className="edit-btn"><MdOutlineFindInPage />Find Jobs</button>
         </div>
       </div>
 

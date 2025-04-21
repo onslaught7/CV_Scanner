@@ -22,3 +22,5 @@ passlib[bcrypt]
 python-multipart
 fastapi[standard]
 werkzeug
+pymupdf
+python-docx

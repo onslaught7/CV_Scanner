@@ -7,11 +7,20 @@ from server.config import settings
 from server.app.models.models import ResumeModel
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from server.app.services.ats_score import ats_score_and_keywords
+from typing import List
 # import boto3
 
 
 class JDRequest(BaseModel):
     jobDescription: str
+
+
+class ATSResponse(BaseModel):
+    atsScore: int
+    keyWordsMatching: List[str]
+    keyWordsMissing: List[str]
+
 
 
 async def save_resume_locally(user: User, db: Session, resume: UploadFile, upload_dir: str = settings.UPLOAD_DIR):
@@ -41,7 +50,7 @@ async def save_resume_s3(file: UploadFile, upload_dir: str = "uploads/resumes"):
     pass
 
 
-async def calculate_ats_score(job_description: JDRequest, user: User, db: Session):
+async def calculate_ats_score(job_description: str, user: User, db: Session):
     try:
         resume_path_url = db.query(ResumeModel).filter(ResumeModel.user_id == user.id).first().resume_url
         if not resume_path_url or not job_description:
@@ -49,9 +58,15 @@ async def calculate_ats_score(job_description: JDRequest, user: User, db: Sessio
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resume not found."
         )
-        # call the functions from services to extract the text calculate the ats, keywords etc and return   
+        ats_score, matching_keywords, missing_keywords = ats_score_and_keywords(resume_path_url, job_description) 
         print("Resume URL froom database: ", resume_path_url)
         print("Job Description from client: ", job_description)
+        return {
+            "atsScore": ats_score,
+            "keyWordsMatching": matching_keywords,
+            "keyWordsMissing": missing_keywords,
+        }
     except Exception as e:
         print("Unexpected error", e)
+        raise HTTPException(status_code=500, detail="Something went wrong during ATS calculation.")
     

@@ -4,7 +4,7 @@ from fastapi import UploadFile, File
 from server.config import settings
 from server.app.models.database import get_db
 from sqlalchemy.orm import Session
-from server.app.controllers.resume_controller import JDRequest, save_resume_locally, save_resume_s3, calculate_ats_score
+from server.app.controllers.resume_controller import JDRequest, save_resume_locally, save_resume_s3, calculate_ats_score, ATSResponse
 from server.app.middlewares.auth_middleware import verify_token
 from server.app.controllers.auth_controller import User
 
@@ -35,7 +35,7 @@ async def upload_resume(
     }
 
 
-@router.post("/calculate-ats")
+@router.post("/calculate-ats", response_model=ATSResponse)
 async def calculate_ats(
     jd: JDRequest, 
     current_user: Annotated[User, Depends(verify_token)], 

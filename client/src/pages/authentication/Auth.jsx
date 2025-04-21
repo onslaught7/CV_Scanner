@@ -74,8 +74,8 @@ const Auth = () => {
       }
     } catch (error) {
       toast.dismiss();
-      if (error.response && error.response.status === 400) {
-        toast.error("Email and Password combination is incorrect");
+      if (error.response && error.response.status === 401) {
+        toast.error("Password is incorrect");
       } else {
         toast.error("Account doesn't exist, Sign Up instead");
       }
