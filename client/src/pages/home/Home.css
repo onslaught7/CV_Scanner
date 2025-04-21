@@ -276,10 +276,22 @@
 
 .strengths {
   border: 1px solid #4CAF50;
+  font-weight: 700;  
+}
+
+.strengths h4 {
+  color: var(--accent-purple);
+  font-weight: 700;
 }
 
 .improvements {
   border: 1px solid #FFC107;
+  font-weight: 700; 
+}
+
+.improvements h4 {
+  color: var(--accent-purple);
+  font-weight: 700;
 }
 
 /* Responsive Design */
