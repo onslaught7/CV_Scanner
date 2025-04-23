@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from server.app.routes import auth_routes, coverletter_routes, resume_routes
+from server.app.routes import auth_routes, coverletter_routes, resume_routes, findjobs_routes
 from fastapi.middleware.cors import CORSMiddleware
 from server.config import settings
 from fastapi.staticfiles import StaticFiles
@@ -36,3 +36,4 @@ def read_root():
 app.include_router(auth_routes.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(resume_routes.router, prefix="/api/resume", tags=["Resume"])
 app.include_router(coverletter_routes.router, prefix="/api/coverletter", tags=["CoverLetter"])
+app.include_router(findjobs_routes.router, prefix="/api/jobsroutes", tags=["FetchJobs"])

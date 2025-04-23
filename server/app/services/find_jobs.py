@@ -1,28 +1,31 @@
 import requests
 from server.config import settings
+
   
 SCRAPINGDOG_API_KEY = settings.SCRAPINGDOG_API_KEY
 SCRAPINGDOG_URL = settings.SCRAPINGDOG_URL
-  
-# params = {
-#     "api_key": SCRAPINGDOG_API_KEY,
-#     "field": "",
-#     "geoid": "",
-#     "page": 0,
-#     "sortBy": ,
-#     "jobType": ,
-#     "expLevel": ,
-#     "workType": ,
-#     "filterByCompany": 
-# }
-  
-# response = requests.get(SCRAPINGDOG_URL, params=params)
-  
-# if response.status_code == 200:
-#     data = response.json()
-#     print(data)
-# else:
-#     print(f"Request failed with status code: {response.status_code}")
+
+
+def fetch_jobs(job_params): 
+    params = {
+        "api_key": SCRAPINGDOG_API_KEY,
+        "field": job_params.field,
+        "geoid": job_params.geoid,
+        "page": job_params.page,
+        "sortBy": job_params.sortBy,
+        "jobType": job_params.jobType,
+        "expLevel": job_params.expLevel,
+        "workType": job_params.workType,
+        "filterByCompany": job_params.filterByCompany
+    }
+    
+    response = requests.get(SCRAPINGDOG_URL, params=params)
+    
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return f"Request failed with status code: {response.status_code}"
 
 
 # ToDo

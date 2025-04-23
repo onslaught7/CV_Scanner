@@ -7,6 +7,7 @@ import { GET_JOBS_ROUTES } from "../../utils/constants.js";
 const Jobs = ({ setJobDescription }) => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [triggerSearch, setTriggerSearch] = useState(0);
   const [filters, setFilters] = useState({
     field: "",
     geoid: "",
@@ -19,19 +20,47 @@ const Jobs = ({ setJobDescription }) => {
   });
   const [totalPages, setTotalPages] = useState(1);
 
+  const locationOptions = [
+    { name: "United States", value: "103644278" },
+    { name: "India", value: "102713980" },
+    { name: "Canada", value: "101174742" },
+    { name: "Germany", value: "101282230" },
+    { name: "United Kingdom", value: "101165590" },
+    { name: "Australia", value: "101452733" },
+    { name: "France", value: "101501875" },
+    { name: "Netherlands", value: "101620260" },
+    { name: "Singapore", value: "102454443" },
+    { name: "United Arab Emirates", value: "103239033" },
+  ];
+
+  const companyOptions = [
+    "Google", "Microsoft", "Amazon", "Meta", "Apple", "Netflix", "Adobe", "IBM",
+    "Intel", "Salesforce", "Oracle", "Cisco", "Uber", "Spotify", "Airbnb", "Snapchat",
+    "LinkedIn", "Twitter", "Dropbox", "Zoom", "Stripe", "Coinbase", "Tesla", "Nvidia",
+    "Accenture", "Capgemini", "Infosys", "TCS", "Wipro", "Zoho"
+  ];
+
   const fetchJobs = async () => {
+    if (!filters.field || !filters.geoid) {
+      return; 
+    }
+
     setLoading(true);
     try {
+
+      console.log(filters);
+
       const response = await apiClient.post(
-        GET_JOBS_ROUTES,
-        filters,
+        GET_JOBS_ROUTES, 
+        filters, 
         { withCredentials: true }
       );
 
       if (response.status === 200) {
+        console.log(response.data.jobs)
         setJobs(response.data.jobs);
         setTotalPages(response.data.totalPages || 1);
-      } 
+      }
     } catch (error) {
       console.error("Failed to fetch jobs.", error);
       toast.dismiss();
@@ -42,11 +71,27 @@ const Jobs = ({ setJobDescription }) => {
   };
 
   useEffect(() => {
-    fetchJobs();
-  }, [filters]);
+    if (triggerSearch) fetchJobs();
+  }, [filters, triggerSearch]);
+
+  useEffect(() => {
+    if (!loading) {
+      document.getElementById("jobs-section")?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [filters.page]);
+  
 
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value, page: 1 });
+  };
+
+  const handleSearchClick = () => {
+    if (!filters.field || !filters.geoid) {
+      toast.error("Please fill in both Field and Location to search.");
+      return;
+    }
+    setFilters(prev => ({ ...prev, page: 1 }));
+    setTriggerSearch(prev => prev + 1);
   };
 
   return (
@@ -54,48 +99,68 @@ const Jobs = ({ setJobDescription }) => {
       <h2 className="jobs-header">🔍 Browse Jobs</h2>
 
       <div className="jobs-filters">
-        <select name="field" onChange={handleFilterChange}>
-          <option value="">Field</option>
-          <option value="Data Analyst">Data Analyst</option>
-          <option value="Web Developer">Web Developer</option>
-        </select>
+        <input
+          type="text"
+          placeholder="Enter job field (e.g., Software Engineer)"
+          name="field"
+          value={filters.field}
+          onChange={handleFilterChange}
+          className="job-input"
+        />
 
         <select name="geoid" onChange={handleFilterChange}>
           <option value="">Location</option>
-          <option value="103644278">United States</option>
-          <option value="102713980">India</option>
+          {locationOptions.map((loc, idx) => (
+            <option key={idx} value={loc.value}>{loc.name}</option>
+          ))}
         </select>
 
         <select name="workType" onChange={handleFilterChange}>
           <option value="">Work Type</option>
-          <option value="REMOTE">Remote</option>
-          <option value="ONSITE">Onsite</option>
-          <option value="HYBRID">Hybrid</option>
+          <option value="Remote">Remote</option>
+          <option value="At Work">At Work</option>
+          <option value="Hybrid">Hybrid</option>
         </select>
 
         <select name="sortBy" onChange={handleFilterChange}>
           <option value="">Sort By</option>
-          <option value="date">Newest</option>
-          <option value="relevance">Relevance</option>
+          <option value="Day">Day</option>
+          <option value="Week">Week</option>
+          <option value="Month">Month</option>
         </select>
 
         <select name="jobType" onChange={handleFilterChange}>
           <option value="">Job Type</option>
-          <option value="FULLTIME">Full-Time</option>
-          <option value="CONTRACT">Contract</option>
+          <option value="Temporary">Temporary</option>
+          <option value="Full Time">Full Time</option>
+          <option value="Contract">Contract</option>
+          <option value="Part Time">Part Time</option>
         </select>
 
         <select name="expLevel" onChange={handleFilterChange}>
           <option value="">Experience</option>
-          <option value="ENTRY_LEVEL">Entry</option>
-          <option value="MID_SENIOR">Mid</option>
+          <option value="Internship">Internship</option>
+          <option value="Entry Level">Entry Level</option>
+          <option value="Associate Level">Associate Level</option>
+          <option value="Mid Senior Level">Mid Senior Level</option>
         </select>
+
+        <select name="filterByCompany" onChange={handleFilterChange}>
+          <option value="">Company</option>
+          {companyOptions.map((company, idx) => (
+            <option key={idx} value={company}>{company}</option>
+          ))}
+        </select>
+
+        <button className="search-btn" onClick={handleSearchClick}>
+          🔎 Search Jobs
+        </button>
       </div>
 
       <div className="jobs-list">
         {loading ? (
           <p className="jobs-loading">Loading jobs...</p>
-        ) : jobs.length > 0 ? (
+        ) : jobs && jobs.length > 0 ? (
           jobs.map((job, idx) => (
             <div key={idx} className="job-card">
               <h3>
@@ -109,19 +174,18 @@ const Jobs = ({ setJobDescription }) => {
                   {job.company_name}
                 </a>
               </p>
-              <p>
-                <strong>Location:</strong> {job.job_location}
-              </p>
-              <p>
-                <strong>Posted On:</strong> {job.job_posting_date}
-              </p>
-              <button className="job-desc-btn" onClick={() => setJobDescription(job.job_position)}>
+              <p><strong>Location:</strong> {job.job_location}</p>
+              <p><strong>Posted On:</strong> {job.job_posting_date}</p>
+              <button
+                className="job-desc-btn"
+                onClick={() => setJobDescription(job.job_position)}
+              >
                 Use this for ATS
               </button>
             </div>
           ))
         ) : (
-          <p className="jobs-empty">No jobs found. Try changing filters.</p>
+          triggerSearch && <p className="jobs-empty">No jobs found. Try changing filters.</p>
         )}
       </div>
 
