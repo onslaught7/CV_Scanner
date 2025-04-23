@@ -9,16 +9,17 @@ import { UPLOAD_RESUME_ROUTE, CALCULATE_ATS_ROUTE, GENERATE_COVERLETTER_ROUTE } 
 import { FaDownload } from "react-icons/fa6";
 import { apiClient } from '../../lib/api_client.js';
 import { MdOutlineCalculate } from "react-icons/md";
-import { MdOutlineFindInPage } from "react-icons/md";
+import { FaRegEdit } from "react-icons/fa";
+import { flushSync } from 'react-dom';
+import Jobs from '../jobs/Jobs.jsx';
 
 const Home = () => {
-  const { userInfo, toastMessage, clearToastMessage } = useAppStore();
+  const { showJobs, userInfo, toastMessage, clearToastMessage } = useAppStore();
   const [jobDescription, setJobDescription] = useState('');
   const [resumeFile, setResumeFile] = useState();
   const [atsScore, setAtsScore] = useState();
   const [matchingKeyWords, setMatchingKeyWords] = useState([]);
   const [missingKeyWords, setMissingKeywords] = useState([]);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const hasShownToast = useRef(false);
 
@@ -82,17 +83,20 @@ const Home = () => {
 
         if (response.status === 200) {
           const { atsScore, keyWordsMatching, keyWordsMissing } = response.data;
-          toast.success("Score Calculated")
+          flushSync(() => {
+            setAtsScore(atsScore);
+            setMatchingKeyWords(keyWordsMatching);
+            setMissingKeywords(keyWordsMissing);
+          });
+        
           toast.dismiss(toastId);
-          setAtsScore(atsScore);
-          setMatchingKeyWords(keyWordsMatching);
-          setMissingKeywords(keyWordsMissing);
+          toast.success("Score Calculated");
         }
       } else {
         toast.error("Both Resume and Job Description required for ATS Score");
       }
     } catch (error) {
-      toast.error("Error analysing resume");
+      toast.error("Error analysing resume, try again");
       console.error("Error analysing resume", error);
     }
   }
@@ -108,7 +112,17 @@ const Home = () => {
         );
 
         if (response.status === 200) {
-          const { coverLetter } = response.data;
+          const coverLetter  = response.data;
+
+          flushSync(() => {
+            console.log(coverLetter)
+            const link = document.createElement('a');
+            const blob = new Blob([response.data], { type: 'text/plain' });
+            link.href = URL.createObjectURL(blob);
+            link.download = 'cover_letter.txt'; // Filename for the downloaded file
+            link.click();
+          })
+
           toast.success("Cover Letter Generated");
           toast.dismiss(toastId);
           // Logic to download the cover letter on client side
@@ -117,7 +131,7 @@ const Home = () => {
         }
       }
     } catch (error) {
-      toast.error("Error generating cover letter");
+      toast.error("Error generating cover letter, try again");
       console.error("Error generating cover letter", error);
     }
   }
@@ -226,7 +240,7 @@ const Home = () => {
           ) : (
             <p>Your ATS score will appear here after analysis</p>
           )}
-          <button className="edit-btn"><MdOutlineFindInPage />Find Jobs</button>
+          <button className="edit-btn"><FaRegEdit />Edit Resume</button>
         </div>
       </div>
 
@@ -272,7 +286,12 @@ const Home = () => {
           />
         </div>
       </div>
-
+      
+      {showJobs && (
+        <div id="jobs-section">
+          <Jobs setJobDescription={setJobDescription} />
+        </div>
+      )}
     </div>
   );
 };

@@ -42,7 +42,7 @@ def cover_letter_service(jd: str, resume_text: str):
 
             Given the following resume and job description, write a detailed, personalized, and industry-standard cover letter in plain text format.
 
-            🔹 Guidelines:
+            Guidelines:
             - Address it to "Hiring Manager"
             - Keep it professional but personalized and confident
             - Mention relevant skills and experience from the resume
@@ -50,8 +50,8 @@ def cover_letter_service(jd: str, resume_text: str):
             - Use standard cover letter formatting with line breaks (use \\n for new lines)
             - End with a thank-you and a signature placeholder ("Sincerely,\\n[Your Name]")
 
-            🎯 Output Format (Important):
-            - Return only the complete cover letter with proper \\n (newline) escape sequences
+            Output Format (Important):
+            - Return only the complete well formatted cover letter in a format that goes well in a. .txt file
             - Do NOT include code blocks, JSON, markdown formatting, or commentary — just the letter
 
             Resume:

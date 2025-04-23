@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Auth from './pages/authentication/Auth'
-import Home from './pages/home/Home'
+import Home from './pages/home/Home'  
 import { useAppStore } from './store/index.js'
 import { useEffect, useState } from 'react'
 import { apiClient } from './lib/api_client.js'
@@ -71,8 +71,8 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/auth" element={<AuthRoute><Auth/></AuthRoute>}/>
-        <Route path='/home' element={<PrivateRoute><Home/></PrivateRoute>}/>
+        <Route path="/auth" element={ <AuthRoute><Auth/></AuthRoute> }/>
+        <Route path='/home' element={ <PrivateRoute><Home/></PrivateRoute> }/>
         <Route path = "*" element = { <Navigate to = "/auth"/>}/>
       </Routes>
     </BrowserRouter>

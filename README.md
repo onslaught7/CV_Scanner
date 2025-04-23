@@ -8,3 +8,8 @@ Things to do
 Add unit and integration tests with something like:
 Backend: pytest, httpx, pytest-asyncio
 Frontend: Vitest, Jest, or React Testing Library
+
+- Add a logic to counter if gpt fails to return a JSON only return 
+- I can also add features where after the jobs are pulled using the api, the job 
+descriptions of those jobs will be pulled directly and the ats scores will be
+automatically calcuated and displayed on the right of each job

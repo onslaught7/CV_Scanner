@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     ALGORITHM: str
     DATABASE_URL: str
     ORIGIN: str
+    SCRAPINGDOG_API_KEY: str
+    SCRAPINGDOG_URL: str
 
     class Config:
         env_file = str(Path(__file__).resolve().parent / ".env")  # absolute path

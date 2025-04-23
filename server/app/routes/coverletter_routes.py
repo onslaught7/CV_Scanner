@@ -16,4 +16,5 @@ async def get_coverletter(
     current_user: Annotated[User, Depends(verify_token)],
     db: Annotated[Session, Depends(get_db)]
 ):
+    print("Job Description from coverletter_routes.py: ", jd.jobDescription)
     return await generate_cover_letter(jd.jobDescription, current_user, db)

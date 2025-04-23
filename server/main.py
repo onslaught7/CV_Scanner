@@ -35,6 +35,4 @@ def read_root():
 # Include the routes
 app.include_router(auth_routes.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(resume_routes.router, prefix="/api/resume", tags=["Resume"])
-# app.include_router(coverletter_route.router, prefix="/api/coverletter", tags=["CoverLetter"])
-
-
+app.include_router(coverletter_routes.router, prefix="/api/coverletter", tags=["CoverLetter"])
