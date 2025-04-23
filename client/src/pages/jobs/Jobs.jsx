@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import "./Jobs.css";
 import { apiClient } from "../../lib/api_client";
 import { toast } from "react-hot-toast";
+import { GET_JOBS_ROUTES } from "../../utils/constants.js";
 
 const Jobs = ({ setJobDescription }) => {
   const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     field: "",
     geoid: "",
@@ -18,18 +20,30 @@ const Jobs = ({ setJobDescription }) => {
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchJobs = async () => {
+    setLoading(true);
     try {
-      const response = await apiClient.post("/jobs", filters);
-      setJobs(response.data.jobs);
-      setTotalPages(response.data.totalPages || 1);
+      const response = await apiClient.post(
+        GET_JOBS_ROUTES,
+        filters,
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        setJobs(response.data.jobs);
+        setTotalPages(response.data.totalPages || 1);
+      } 
     } catch (error) {
+      console.error("Failed to fetch jobs.", error);
+      toast.dismiss();
       toast.error("Failed to fetch jobs.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchJobs();
-  }, [filters.page]);
+  }, [filters]);
 
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value, page: 1 });
@@ -79,7 +93,9 @@ const Jobs = ({ setJobDescription }) => {
       </div>
 
       <div className="jobs-list">
-        {jobs.length > 0 ? (
+        {loading ? (
+          <p className="jobs-loading">Loading jobs...</p>
+        ) : jobs.length > 0 ? (
           jobs.map((job, idx) => (
             <div key={idx} className="job-card">
               <h3>
@@ -87,9 +103,18 @@ const Jobs = ({ setJobDescription }) => {
                   {job.job_position}
                 </a>
               </h3>
-              <p><strong>Company:</strong> <a href={job.company_profile} target="_blank">{job.company_name}</a></p>
-              <p><strong>Location:</strong> {job.job_location}</p>
-              <p><strong>Posted On:</strong> {job.job_posting_date}</p>
+              <p>
+                <strong>Company:</strong>{" "}
+                <a href={job.company_profile} target="_blank" rel="noopener noreferrer">
+                  {job.company_name}
+                </a>
+              </p>
+              <p>
+                <strong>Location:</strong> {job.job_location}
+              </p>
+              <p>
+                <strong>Posted On:</strong> {job.job_posting_date}
+              </p>
               <button className="job-desc-btn" onClick={() => setJobDescription(job.job_position)}>
                 Use this for ATS
               </button>
@@ -101,11 +126,17 @@ const Jobs = ({ setJobDescription }) => {
       </div>
 
       <div className="jobs-pagination">
-        <button disabled={filters.page <= 1} onClick={() => setFilters({ ...filters, page: filters.page - 1 })}>
+        <button
+          disabled={filters.page <= 1}
+          onClick={() => setFilters({ ...filters, page: filters.page - 1 })}
+        >
           &lt;
         </button>
         <span>{filters.page} / {totalPages}</span>
-        <button disabled={filters.page >= totalPages} onClick={() => setFilters({ ...filters, page: filters.page + 1 })}>
+        <button
+          disabled={filters.page >= totalPages}
+          onClick={() => setFilters({ ...filters, page: filters.page + 1 })}
+        >
           &gt;
         </button>
       </div>
