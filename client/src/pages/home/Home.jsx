@@ -129,6 +129,8 @@ const Home = () => {
         } else {
           toast.error("Make sure resume has been uploaded and job description is included");
         }
+      } else {
+        toast.error("Include both the resume and the job description");
       }
     } catch (error) {
       toast.error("Error generating cover letter, try again");
