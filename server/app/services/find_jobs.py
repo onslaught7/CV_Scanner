@@ -18,11 +18,16 @@ def fetch_jobs(job_params):
         "workType": job_params.workType,
         "filterByCompany": job_params.filterByCompany
     }
-    
+    # print("The parametes received here: ", job_params)
+    # print("The parameter being sent to scrappingdog: ", params)
     response = requests.get(SCRAPINGDOG_URL, params=params)
     
     if response.status_code == 200:
         data = response.json()
+        # print("Response from the scrapping dog api")
+        # for job in data:
+        #     print(job)
+        print("Full URL:", response.url)
         return data
     else:
         return f"Request failed with status code: {response.status_code}"

@@ -84,6 +84,8 @@ def ats_score_and_keywords(resume_path: str, job_description: str) -> Tuple[int,
     Be sure to strictly return only the JSON Object and nothing else, since it is directly going to be used in code.
     Make sure to strictly adhere to returning a JSON object.
 
+    Return only the JSON object nothing before and after it.
+
     Resume:
     \"\"\"
     {resume_text}

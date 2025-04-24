@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; 
 import "./Jobs.css";
 import { apiClient } from "../../lib/api_client";
 import { toast } from "react-hot-toast";
@@ -11,7 +11,7 @@ const Jobs = ({ setJobDescription }) => {
   const [filters, setFilters] = useState({
     field: "",
     geoid: "",
-    page: 1,
+    page: 5,
     sortBy: "",
     jobType: "",
     expLevel: "",
@@ -19,6 +19,8 @@ const Jobs = ({ setJobDescription }) => {
     filterByCompany: "",
   });
   const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1); // for frontend pagination
+  const jobsPerPage = 10;
 
   const locationOptions = [
     { name: "United States", value: "103644278" },
@@ -47,9 +49,7 @@ const Jobs = ({ setJobDescription }) => {
 
     setLoading(true);
     try {
-
       console.log(filters);
-
       const response = await apiClient.post(
         GET_JOBS_ROUTES, 
         filters, 
@@ -60,6 +60,7 @@ const Jobs = ({ setJobDescription }) => {
         console.log(response.data.jobs)
         setJobs(response.data.jobs);
         setTotalPages(response.data.totalPages || 1);
+        setCurrentPage(1); // reset to first frontend page on new fetch
       }
     } catch (error) {
       console.error("Failed to fetch jobs.", error);
@@ -79,10 +80,9 @@ const Jobs = ({ setJobDescription }) => {
       document.getElementById("jobs-section")?.scrollIntoView({ behavior: "smooth" });
     }
   }, [filters.page]);
-  
 
   const handleFilterChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value, page: 1 });
+    setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
   const handleSearchClick = () => {
@@ -90,9 +90,14 @@ const Jobs = ({ setJobDescription }) => {
       toast.error("Please fill in both Field and Location to search.");
       return;
     }
-    setFilters(prev => ({ ...prev, page: 1 }));
+    setFilters(prev => ({ ...prev, page: 5 }));
     setTriggerSearch(prev => prev + 1);
-  };
+  };  
+
+  const jobsToRender = jobs.slice(
+    (currentPage - 1) * jobsPerPage,
+    currentPage * jobsPerPage
+  );
 
   return (
     <div className="jobs-container" id="jobs-section">
@@ -161,7 +166,7 @@ const Jobs = ({ setJobDescription }) => {
         {loading ? (
           <p className="jobs-loading">Loading jobs...</p>
         ) : jobs && jobs.length > 0 ? (
-          jobs.map((job, idx) => (
+          jobsToRender.map((job, idx) => (
             <div key={idx} className="job-card">
               <h3>
                 <a href={job.job_link} target="_blank" rel="noopener noreferrer">
@@ -191,15 +196,15 @@ const Jobs = ({ setJobDescription }) => {
 
       <div className="jobs-pagination">
         <button
-          disabled={filters.page <= 1}
-          onClick={() => setFilters({ ...filters, page: filters.page - 1 })}
+          disabled={currentPage <= 1}
+          onClick={() => setCurrentPage(prev => prev - 1)}
         >
           &lt;
         </button>
-        <span>{filters.page} / {totalPages}</span>
+        <span>{currentPage} / {Math.ceil(jobs.length / jobsPerPage)}</span>
         <button
-          disabled={filters.page >= totalPages}
-          onClick={() => setFilters({ ...filters, page: filters.page + 1 })}
+          disabled={currentPage >= Math.ceil(jobs.length / jobsPerPage)}
+          onClick={() => setCurrentPage(prev => prev + 1)}
         >
           &gt;
         </button>
