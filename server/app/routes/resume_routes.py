@@ -21,11 +21,7 @@ async def upload_resume(
 ):
     print("File received at resume_routes: ", resume.filename)
     if settings.ENV == "production":
-        # path = save_resume_s3(file, bucket_name = settings.S3_BUCKET)
-        # path, filename = "To be implemented"
-        path = "s3/path/to/resume.pdf"
-        filename = resume.filename
-        pass
+        path, filename = await save_resume_s3(current_user, db, resume)
     else:
         path, filename = await save_resume_locally(current_user, db, resume)
     return {

@@ -7,7 +7,7 @@ import sys
 def create_tables():
     try:
         models.Base.metadata.create_all(bind=engine)
-        print("✅ Tables created sucessfully.")
+        print("✅ Tables created successfully.")
     except Exception as e:
         print("❌ Failed to create tables.", e)
         sys.exit(1)

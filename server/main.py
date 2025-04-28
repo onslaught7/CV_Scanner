@@ -27,9 +27,9 @@ if settings.ENV != "production":
     app.mount(settings.UPLOAD_MOUNT_PATH, StaticFiles(directory=settings.UPLOAD_DIR), name="upload-resumes")
 
 # Health Check Route
-@app.get("/")
+@app.get("/health")
 def read_root():
-    return {"message": "CV Sacnner API is running. 💨"}
+    return {"message": "CV Scanner API is running. 💨"}
 
 
 # Include the routes

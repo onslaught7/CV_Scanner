@@ -6,6 +6,9 @@ import openai
 import json
 import time
 from server.config import settings
+import io
+import boto3
+
 
 # Secure API key setup for OpenAI
 OPENAI_API_KEY = settings.OPENAI_API_KEY
@@ -13,17 +16,52 @@ client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 
 # ----------- Text Extraction -----------
+# def extract_text_from_resume(file_path: str) -> str:
+#     _, ext = os.path.splitext(file_path.lower())
+#     if ext == ".pdf":
+#         text = ""
+#         with fitz.open(file_path) as doc:
+#             for page in doc:
+#                 text += page.get_text()
+#         return text
+#     elif ext == ".docx":
+#         doc = Document(file_path)
+#         return "\n".join([para.text for para in doc.paragraphs])
+#     else:
+#         raise ValueError("Unsupported file format: must be .pdf or .docx")
 def extract_text_from_resume(file_path: str) -> str:
     _, ext = os.path.splitext(file_path.lower())
+
+    if file_path.startswith("s3://"):
+        s3_parts = file_path.replace("s3://", "").split("/", 1)
+        bucket = s3_parts[0]
+        key = s3_parts[1]
+
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_REGION
+        )
+
+        resume_stream = io.BytesIO()
+        s3.download_fileobj(bucket, key, resume_stream)
+        resume_stream.seek(0)  # Go back to the start of the stream
+    else:
+        # Local file
+        resume_stream = open(file_path, "rb")
+
     if ext == ".pdf":
         text = ""
-        with fitz.open(file_path) as doc:
+        with fitz.open(stream=resume_stream, filetype="pdf") as doc:
             for page in doc:
                 text += page.get_text()
         return text
+
     elif ext == ".docx":
-        doc = Document(file_path)
+        doc = Document(resume_stream)
         return "\n".join([para.text for para in doc.paragraphs])
+
     else:
         raise ValueError("Unsupported file format: must be .pdf or .docx")
 

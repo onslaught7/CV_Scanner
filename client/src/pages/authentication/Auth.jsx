@@ -245,11 +245,11 @@ const Auth = () => {
               )
           }
 
-          <div className="auth-divider">
+          {/* <div className="auth-divider">
             <span>OR</span>
-          </div>
+          </div> */}
 
-          {
+          {/* {
             !isLogin ?
               (
                 <button 
@@ -271,7 +271,7 @@ const Auth = () => {
                   Sign In With Google
                 </button>
               )
-          }
+          } */}
         </form>
       </div>
     </div>

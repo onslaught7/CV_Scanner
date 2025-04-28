@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
     SECRET_KEY: str
     ALGORITHM: str
+    AWS_REGION: str
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
+    AWS_BUCKET_NAME: str
     DATABASE_URL: str
     ORIGIN: str
     SCRAPINGDOG_API_KEY: str

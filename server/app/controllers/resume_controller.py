@@ -9,8 +9,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from server.app.services.ats_score import ats_score_and_keywords
 from typing import List
-# import boto3
-
+import boto3
 
 class JDRequest(BaseModel):
     jobDescription: str
@@ -44,10 +43,36 @@ async def save_resume_locally(user: User, db: Session, resume: UploadFile, uploa
         return file_path, new_filename
     except Exception as e:
         print("Unexpected Error Occured", e)
+        raise HTTPException(status_code=500, detail="Error saving resume")
 
 
-async def save_resume_s3(file: UploadFile, upload_dir: str = "uploads/resumes"):
-    pass
+async def save_resume_s3(user: User, db: Session, resume: UploadFile, upload_dir: str = settings.UPLOAD_DIR):
+    try:
+        print("User received in save_resume_s3 with id: ", user.id)
+        print("File received in save_resume_s3: ", resume.filename)
+        original_filename = secure_filename(resume.filename)
+        _, ext = os.path.splitext(original_filename)
+        new_filename = f"{user.id}{ext}"
+        s3_path = f"{upload_dir}/{new_filename}"
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_REGION
+        )
+        s3.upload_fileobj(resume.file, settings.AWS_BUCKET_NAME, s3_path)
+        resume_record = db.query(ResumeModel).filter(ResumeModel.user_id == user.id).first()
+        if resume_record:
+            resume_record.resume_url = f"s3://{settings.AWS_BUCKET_NAME}/{s3_path}"
+        else:
+            resume_record = ResumeModel(user_id = user.id, resume_url = f"s3://{settings.AWS_BUCKET_NAME}/{s3_path}")
+            db.add(resume_record)
+        db.commit()
+        db.refresh(resume_record)
+        return f"s3://{settings.AWS_BUCKET_NAME}/{s3_path}", new_filename
+    except Exception as e:
+        print("Unexpected Error Occurred", e)
+        raise HTTPException(status_code=500, detail="Error saving resume to S3")
 
 
 async def calculate_ats_score(job_description: str, user: User, db: Session):
