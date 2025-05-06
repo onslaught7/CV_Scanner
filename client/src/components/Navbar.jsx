@@ -49,7 +49,7 @@ const Navbar = () => {
         >
           Home
         </button>
-        <button className="nav-btn">Support</button>
+        {/* <button className="nav-btn">Support</button> */}
         <button 
           className="nav-btn"
           onClick={() => {
