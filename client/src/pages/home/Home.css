@@ -383,3 +383,9 @@
   /* Remove any max-width that might constrain one differently */
   max-width: none;
 }
+
+.upload-label.drag-over {
+  border-color: #007bff;
+  background-color: #f8f9fa;
+  border-style: dashed;
+}
