@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str
     UPLOAD_MOUNT_PATH: str
     OPENAI_API_KEY: str
+    GEMINI_API_KEY: str
     SECRET_KEY: str
     ALGORITHM: str
     DATABASE_URL: str
