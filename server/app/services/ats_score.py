@@ -2,14 +2,10 @@ import fitz
 import os
 from docx import Document
 from typing import List, Tuple
-import openai
 import json
-import time
 from server.config import settings
-
-# Secure API key setup for OpenAI
-OPENAI_API_KEY = settings.OPENAI_API_KEY
-client = openai.OpenAI(api_key=OPENAI_API_KEY)
+import re
+from server.app.services.llm_service import call_gpt_with_retry, call_gemini_with_retry
 
 
 # ----------- Text Extraction -----------
@@ -28,40 +24,63 @@ def extract_text_from_resume(file_path: str) -> str:
         raise ValueError("Unsupported file format: must be .pdf or .docx")
 
 
-# ----------- GPT Retry Logic -----------
-def call_gpt_with_retry(prompt: str, retries: int = 3, delay: int = 2) -> str:
-    for attempt in range(retries):
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": "You are a smart, structured ATS resume analyzer."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.2,
-                max_tokens=1000
-            )
-            return response.choices[0].message.content
-        except openai.RateLimitError:
-            print(f"[Rate Limit] Attempt {attempt + 1}: retrying in {delay} seconds...")
-            time.sleep(delay)
-        except openai.OpenAIError as e:
-            print(f"[OpenAI Error] Attempt {attempt + 1}: {e}")
-            time.sleep(delay)
-    raise RuntimeError("GPT API failed after multiple retries.")
-
-
-# ----------- JSON Validation -----------
+# ----------- JSON Cleaning and Validation -----------
 def validate_json_response(response_text: str) -> dict:
+    """
+    Cleans potential markdown fences and whitespace from the response
+    before validating and parsing the JSON.
+    """
+    if not response_text:
+        print("[Validation Error] Received empty response text.")
+        raise RuntimeError("LLM did not return any text.")
+
+    # Use regex to find the JSON object ({...})
+    # This looks for the first '{' followed by anything until the last '}'
+    # It handles nested braces and multi-line JSON.
+    match = re.search(r"\{[\s\S]*\}", response_text) # Find text between { and }
+
+    if not match:
+        # Log the problematic response for debugging
+        print(f"[Validation Error] No JSON object found in the response text:\n---\n{response_text}\n---")
+        raise RuntimeError("LLM did not return a valid JSON object structure.")
+
+    json_string = match.group(0) # Extract the matched JSON part
+
     try:
-        parsed = json.loads(response_text)
-        assert "ats_score" in parsed
-        assert "matched_keywords" in parsed
-        assert "missing_keywords" in parsed
+        # Attempt to parse the extracted string
+        parsed = json.loads(json_string)
+
+        # --- Your original assertions ---
+        assert "ats_score" in parsed, "Missing 'ats_score' key"
+        assert "matched_keywords" in parsed, "Missing 'matched_keywords' key"
+        assert "missing_keywords" in parsed, "Missing 'missing_keywords' key"
+        # --- End of original assertions ---
+
+        # Add type checks for robustness
+        if not isinstance(parsed.get("ats_score"), (int, float)):
+             raise ValueError("'ats_score' must be a number")
+        if not isinstance(parsed.get("matched_keywords"), list):
+             raise ValueError("'matched_keywords' must be a list")
+        if not isinstance(parsed.get("missing_keywords"), list):
+             raise ValueError("'missing_keywords' must be a list")
+
+        # Ensure score is returned as int
+        parsed["ats_score"] = int(parsed["ats_score"])
+
         return parsed
-    except (json.JSONDecodeError, AssertionError) as e:
-        print("[Validation Error] Invalid JSON returned by GPT:", e)
-        raise RuntimeError("GPT did not return valid JSON.")
+    except json.JSONDecodeError as e:
+        print(f"[Validation Error] Failed to decode JSON after cleaning: {e}")
+        print(f"Attempted to parse: {json_string}") # Log what was parsed
+        raise RuntimeError("LLM response contained invalid JSON structure after cleaning.")
+    except (AssertionError, ValueError) as e:
+        print(f"[Validation Error] Invalid JSON structure or types: {e}")
+        print(f"Parsed data structure: {parsed}") # Log the structure that failed validation
+        raise RuntimeError("LLM returned JSON with incorrect structure or types.")
+    except Exception as e:
+        # Catch any other unexpected error during parsing/validation
+        print(f"[Validation Error] Unexpected error during validation: {e}")
+        print(f"Problematic JSON string: {json_string}")
+        raise RuntimeError("Unexpected error processing the JSON response.")
 
 
 # ----------- Main ATS Function -----------
@@ -82,7 +101,9 @@ def ats_score_and_keywords(resume_path: str, job_description: str) -> Tuple[int,
     Ignore stop words, general English words, or formatting.
 
     Be sure to strictly return only the JSON Object and nothing else, since it is directly going to be used in code.
-    Make sure to strictly adhere to returning a JSON object.
+    Make sure to strictly adhere to returning a JSON object. 
+
+    You are not allowed to wrap using ```json ``` as well. Just strictly JSON with beginning and ending curly braces.
 
     Return only the JSON object nothing before and after it.
 
@@ -97,8 +118,9 @@ def ats_score_and_keywords(resume_path: str, job_description: str) -> Tuple[int,
     \"\"\"
     """
     try:
-        gpt_response = call_gpt_with_retry(prompt)
-        ats_data = validate_json_response(gpt_response)
+        # response = call_gpt_with_retry(prompt)
+        response = call_gemini_with_retry(prompt)
+        ats_data = validate_json_response(response)
         return (
             int(ats_data["ats_score"]),
             ats_data["matched_keywords"],

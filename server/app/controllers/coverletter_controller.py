@@ -11,11 +11,8 @@ async def generate_cover_letter(jd: str, user: User, db: Session):
         if not resume_record: 
             raise HTTPException(status_code=400, detail="User record not found")
         resume_url = resume_record.resume_url
-        print("Resume Url in coverletter_controller.py: ", resume_url)
         resume_text = extract_text_from_resume(resume_url)
-        print("Resume Url in coverletter_controller.py: ", resume_text)
         generated_cover_letter = cover_letter_service(jd, resume_text)
-        print("Cover letter returned from cover_letter, to coverletter_controller.py: ", generated_cover_letter)
         return generated_cover_letter
     except Exception as e:
         print("Unexpected error", e)
